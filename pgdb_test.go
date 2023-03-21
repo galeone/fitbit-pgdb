@@ -22,33 +22,38 @@ func init() {
 	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
 	var igordb *igor.Database
 	if igordb, err = igor.Connect(connectionString); err != nil {
-		panic(err.Error())
+		panic(fmt.Sprintf("%s: %s", connectionString, err.Error()))
 	}
 
 	tx := igordb.Begin()
 
-	var authorizedUser types.AuthorizedUser
+	var authorizedUser pgdb.AuthorizedUser
 	if err = tx.Exec(fmt.Sprintf(
 		`CREATE TABLE IF NOT EXISTS "%s" (
-		user_id TEXT NOT NULL PRIMARY KEY,
+		id BIGSERIAL PRIMARY KEY,
+		user_id TEXT NOT NULL,
 		token_type TEXT NOT NULL,
 		scope TEXT NOT NULL,
 		refresh_token TEXT NOT NULL,
 		expires_in INTEGER NOT NULL,
 		access_token TEXT NOT NULL,
 		created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-		UNIQUE(access_token))`, authorizedUser.TableName())); err != nil {
+		UNIQUE(access_token),
+		UNIQUE(user_id)
+	)`, authorizedUser.TableName())); err != nil {
 		_ = tx.Rollback()
 		panic(err.Error())
 	}
 
-	var authorizingUser types.AuthorizingUser
+	var authorizingUser pgdb.AuthorizingUser
 	if err = tx.Exec(fmt.Sprintf(
 		`CREATE TABLE IF NOT EXISTS "%s" (
-		csrftoken TEXT NOT NULL PRIMARY KEY,
+		id BIGSERIAL PRIMARY KEY,
+		csrftoken TEXT NOT NULL,
 		code TEXT NOT NULL,
-		created_at TIMESTAMP NOT NULL DEFAULT NOW()
-		)`, authorizingUser.TableName())); err != nil {
+		created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+		UNIQUE(csrftoken)
+	)`, authorizingUser.TableName())); err != nil {
 		_ = tx.Rollback()
 		panic(err.Error())
 	}
@@ -63,7 +68,7 @@ var db fitbit.Storage
 func TestAuthorizingUser(t *testing.T) {
 	db = pgdb.NewPGDB()
 	var err error
-	pk := "primary key value"
+	pk := "unique token"
 	if err = db.InsertAuhorizingUser(&types.AuthorizingUser{
 		Code:      "1",
 		CSRFToken: pk,
@@ -98,7 +103,6 @@ func TestAuthorized(t *testing.T) {
 	}
 
 	// Fetch
-
 	var fetched *types.AuthorizedUser
 	if fetched, err = db.AuthorizedUser(pk); err != nil {
 		t.Errorf("AuthorizedUser (get by ID) should work but got: %s", err)
@@ -107,12 +111,13 @@ func TestAuthorized(t *testing.T) {
 	if fetched.AccessToken != user.AccessToken {
 		t.Errorf("Fetched user differs from inserted user. Expected %v got %v", user, fetched)
 	}
-	// Update
 
+	// Update
 	user.RefreshToken = "changed"
 	if err = db.UpsertAuthorizedUser(&user); err != nil {
 		t.Errorf("Update of Auhtorized User should work but got: %s", err)
 	}
+
 	// Verify
 	if fetched, err = db.AuthorizedUser(pk); err != nil {
 		t.Errorf("AuthorizedUser (get by ID) should work but got: %s", err)
