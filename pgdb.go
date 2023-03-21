@@ -26,7 +26,7 @@ type PGDB struct {
 }
 
 // NewPGDB creates a new connection to a PostgreSQL server
-// using the following environement variables:
+// using the following environment variables:
 // - DB_USER
 // - DB_PASS
 // - DB_NAME
@@ -49,19 +49,31 @@ func NewPGDB() *PGDB {
 // InsertAuhorizingUser executes a CREATE query on the PostgreSQL database
 // inserting the authorizing user in the associated table.
 func (s *PGDB) InsertAuhorizingUser(authorizing *types.AuthorizingUser) error {
-	return s.Create(authorizing)
+	authorizingUser := &AuthorizingUser{
+		AuthorizingUser: *authorizing,
+	}
+	return s.Create(authorizingUser)
 }
 
 // UpsertAuthorizedUser executes INSERT or UPDATE the user on the PostgreSQL database.
-// It insert the user, if the SELECT by user PRIMARY KEY returns the empty set.
-// If it finds the user, it updates all the other NON PRIMARY KEY fields.
-func (s *PGDB) UpsertAuthorizedUser(user *types.AuthorizedUser) error {
-	var exists types.AuthorizedUser
+// It inserts the user if the SELECT by user UserID fields returns the empty set.
+// If it finds the user insteads it updates all the other NON PRIMARY KEY (or equivalent like UserID) fields.
+func (s *PGDB) UpsertAuthorizedUser(authorized *types.AuthorizedUser) error {
+	user := &AuthorizedUser{
+		AuthorizedUser: *authorized,
+	}
+	var exists AuthorizedUser
 	var err error
-	if err = s.First(&exists, user.UserID); err != nil {
+	var condition AuthorizedUser
+	condition.UserID = authorized.UserID
+	if err = s.Model(AuthorizedUser{}).Where(condition).Scan(&exists); err != nil {
+		return err
+	}
+	if exists.ID == 0 {
 		// First time we see this user
 		err = s.Create(user)
 	} else {
+		user.ID = exists.ID
 		err = s.Updates(user)
 	}
 	return err
@@ -71,21 +83,28 @@ func (s *PGDB) UpsertAuthorizedUser(user *types.AuthorizedUser) error {
 // `accessToken` as only query parameter.
 // NOTE: the `accessToken` is unique on the underlying table.
 func (s *PGDB) AuthorizedUser(accessToken string) (*types.AuthorizedUser, error) {
-	var dbToken types.AuthorizedUser
+	var dbToken AuthorizedUser
 	var err error
-	if err = s.Model(types.AuthorizedUser{}).Where(&types.AuthorizedUser{AccessToken: accessToken}).Scan(&dbToken); err != nil {
+	var condition AuthorizedUser
+	condition.AccessToken = accessToken
+	if err = s.Model(AuthorizedUser{}).Where(&condition).Scan(&dbToken); err != nil {
 		return nil, err
 	}
-	return &dbToken, nil
+	return &dbToken.AuthorizedUser, nil
 }
 
 // AuthorizingUser executes a SELECT for the types.AuthorizingUser using the `id`
 // provided as PRIMARY KEY for creating the query.
 func (s *PGDB) AuthorizingUser(id string) (*types.AuthorizingUser, error) {
-	var authorizing types.AuthorizingUser
+	var authorizing AuthorizingUser
 	var err error
-	if err = s.First(&authorizing, id); err != nil {
+	var condition AuthorizingUser
+	condition.CSRFToken = id
+	if err = s.Model(AuthorizingUser{}).Where(&condition).Scan(&authorizing); err != nil {
 		return nil, err
 	}
-	return &authorizing, nil
+	return &types.AuthorizingUser{
+		Code:      authorizing.Code,
+		CSRFToken: authorizing.CSRFToken,
+	}, nil
 }
