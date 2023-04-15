@@ -67,9 +67,6 @@ func (s *PGDB) UpsertAuthorizedUser(authorized *types.AuthorizedUser) error {
 	var condition AuthorizedUser
 	condition.UserID = authorized.UserID
 	if err = s.Model(AuthorizedUser{}).Where(condition).Scan(&exists); err != nil {
-		return err
-	}
-	if exists.ID == 0 {
 		// First time we see this user
 		err = s.Create(user)
 	} else {
