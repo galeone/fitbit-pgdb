@@ -15,14 +15,16 @@ import (
 	"github.com/galeone/igor"
 )
 
+var _connectionString string
+
 func init() {
 
 	var err error
 
-	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
+	_connectionString = fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
 	var igordb *igor.Database
-	if igordb, err = igor.Connect(connectionString); err != nil {
-		panic(fmt.Sprintf("%s: %s", connectionString, err.Error()))
+	if igordb, err = igor.Connect(_connectionString); err != nil {
+		panic(fmt.Sprintf("%s: %s", _connectionString, err.Error()))
 	}
 
 	tx := igordb.Begin()
@@ -66,7 +68,7 @@ func init() {
 var db fitbit.Storage
 
 func TestAuthorizingUser(t *testing.T) {
-	db = pgdb.NewPGDB()
+	db = pgdb.NewPGDB(_connectionString)
 	var err error
 	pk := "unique token"
 	if err = db.InsertAuhorizingUser(&types.AuthorizingUser{
@@ -85,7 +87,7 @@ func TestAuthorizingUser(t *testing.T) {
 }
 
 func TestAuthorized(t *testing.T) {
-	db = pgdb.NewPGDB()
+	db = pgdb.NewPGDB(_connectionString)
 	var err error
 	pk := "unique id"
 	user := types.AuthorizedUser{

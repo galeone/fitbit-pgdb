@@ -11,9 +11,6 @@ package fitbit_pgdb
 // [2]: https://github.com/galeone/fitbit
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/galeone/fitbit/types"
 	"github.com/galeone/igor"
 
@@ -25,16 +22,12 @@ type PGDB struct {
 	*igor.Database
 }
 
-// NewPGDB creates a new connection to a PostgreSQL server
-// using the following environment variables:
-// - DB_USER
-// - DB_PASS
-// - DB_NAME
-// Loaded from a `.env` file, if present.
+// NewPGDB creates a new connection to a PostgreSQL server.
+// You must provide the connection string to use for connecting to a
+// running PostgreSQL instance.
 //
 // It implements the `fitbit.Storage` interface.
-func NewPGDB() *PGDB {
-	connectionString := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASS"), os.Getenv("DB_NAME"))
+func NewPGDB(connectionString string) *PGDB {
 	var err error
 	var db *igor.Database
 	if db, err = igor.Connect(connectionString); err != nil {
