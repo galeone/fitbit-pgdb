@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/galeone/fitbit"
-	pgdb "github.com/galeone/fitbit-pgdb"
+	pgdb "github.com/galeone/fitbit-pgdb/v2"
 	"github.com/galeone/fitbit/types"
 	"github.com/galeone/igor"
 )

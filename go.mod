@@ -1,4 +1,4 @@
-module github.com/galeone/fitbit-pgdb
+module github.com/galeone/fitbit-pgdb/v2
 
 go 1.19
 
