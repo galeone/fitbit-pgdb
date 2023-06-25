@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/galeone/fitbit v1.0.3
-	github.com/galeone/igor v1.0.8
+	github.com/galeone/igor v1.0.9
 	github.com/joho/godotenv v1.5.1
 )
 
