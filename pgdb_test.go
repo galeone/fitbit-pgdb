@@ -5,6 +5,7 @@
 package fitbit_pgdb_test
 
 import (
+	"database/sql"
 	"fmt"
 	"os"
 	"testing"
@@ -66,6 +67,21 @@ func init() {
 }
 
 var db fitbit.Storage
+
+func TestPGDBNew(t *testing.T) {
+	// Test connection re-use
+	if connection, err := sql.Open("postgres", _connectionString); err != nil {
+		if db = pgdb.NewPGDBFromConnection(connection); db == nil {
+			t.Errorf("Unable to re-use db connection when creating PGDB object")
+		}
+	}
+
+	// Test connection creation
+	if db = pgdb.NewPGDB(_connectionString); db == nil {
+		t.Errorf("Unable to create a PGDB object creating a connection")
+	}
+
+}
 
 func TestAuthorizingUser(t *testing.T) {
 	db = pgdb.NewPGDB(_connectionString)

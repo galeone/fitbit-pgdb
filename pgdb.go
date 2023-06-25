@@ -11,6 +11,8 @@ package fitbit_pgdb
 // [2]: https://github.com/galeone/fitbit
 
 import (
+	"database/sql"
+
 	"github.com/galeone/fitbit/types"
 	"github.com/galeone/igor"
 
@@ -26,11 +28,27 @@ type PGDB struct {
 // You must provide the connection string to use for connecting to a
 // running PostgreSQL instance.
 //
-// It implements the `fitbit.Storage` interface.
+// *PGDB implements the `fitbit.Storage` interface.
 func NewPGDB(connectionString string) *PGDB {
 	var err error
 	var db *igor.Database
 	if db, err = igor.Connect(connectionString); err != nil {
+		panic(err.Error())
+	}
+
+	return &PGDB{
+		db,
+	}
+}
+
+// NewPGDBFromConnection creates a new instance of PGDB without creating
+// a new connection. It re-uses the database connection provided as input.
+//
+// *PGDB implements the `fitbit.Storage` interface.
+func NewPGDBFromConnection(connection *sql.DB) *PGDB {
+	var err error
+	var db *igor.Database
+	if db, err = igor.Wrap(connection); err != nil {
 		panic(err.Error())
 	}
 
