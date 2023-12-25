@@ -1,9 +1,9 @@
-module github.com/galeone/fitbit-pgdb/v2
+module github.com/galeone/fitbit-pgdb/v3
 
 go 1.21
 
 require (
-	github.com/galeone/fitbit v1.0.3
+	github.com/galeone/fitbit/v2 v2.0.0
 	github.com/galeone/igor v1.0.10
 	github.com/joho/godotenv v1.5.1
 )

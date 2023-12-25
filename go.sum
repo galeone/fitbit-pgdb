@@ -1,5 +1,7 @@
 github.com/galeone/fitbit v1.0.3 h1:iYC3japYbCsWc6SyMz3JXTwKnCnG3y8oLgZ9uy4yQKM=
 github.com/galeone/fitbit v1.0.3/go.mod h1:osb+HFcVMMkAP/NH2+HVB2UAYP7A1kOpKYmkfbtL2fY=
+github.com/galeone/fitbit/v2 v2.0.0 h1:55gp6WnaSTCjKq6r1zXrNbY/wUSYWl4Spl3A12T63Mg=
+github.com/galeone/fitbit/v2 v2.0.0/go.mod h1:AeyA4hlKbmP7c49DJ1a9/BpvmMCOt9DfdKGBZIwBX9I=
 github.com/galeone/igor v1.0.10 h1:npToKhFOi0Jfrxl3HDBDgGQB9XX0plrhLeAOnHK00pg=
 github.com/galeone/igor v1.0.10/go.mod h1:txjjvD5/ZGxQ9+JqoP8o74I/gxMmHyFgP5wcSScEA50=
 github.com/golang/protobuf v1.5.0/go.mod h1:FsONVRAS9T7sI+LIUmWTfcYkHO4aIWwzhcaSAoJOfIk=

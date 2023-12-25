@@ -13,7 +13,7 @@ package fitbit_pgdb
 import (
 	"database/sql"
 
-	"github.com/galeone/fitbit/types"
+	"github.com/galeone/fitbit/v2/types"
 	"github.com/galeone/igor"
 
 	_ "github.com/joho/godotenv/autoload"
@@ -57,9 +57,9 @@ func NewPGDBFromConnection(connection *sql.DB) *PGDB {
 	}
 }
 
-// InsertAuhorizingUser executes a CREATE query on the PostgreSQL database
+// InsertAuthorizingUser executes a CREATE query on the PostgreSQL database
 // inserting the authorizing user in the associated table.
-func (s *PGDB) InsertAuhorizingUser(authorizing *types.AuthorizingUser) error {
+func (s *PGDB) InsertAuthorizingUser(authorizing *types.AuthorizingUser) error {
 	authorizingUser := &AuthorizingUser{
 		AuthorizingUser: *authorizing,
 	}

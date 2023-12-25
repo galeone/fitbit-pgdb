@@ -10,9 +10,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/galeone/fitbit"
-	pgdb "github.com/galeone/fitbit-pgdb/v2"
-	"github.com/galeone/fitbit/types"
+	pgdb "github.com/galeone/fitbit-pgdb/v3"
+	"github.com/galeone/fitbit/v2"
+	"github.com/galeone/fitbit/v2/types"
 	"github.com/galeone/igor"
 )
 
@@ -87,11 +87,11 @@ func TestAuthorizingUser(t *testing.T) {
 	db = pgdb.NewPGDB(_connectionString)
 	var err error
 	pk := "unique token"
-	if err = db.InsertAuhorizingUser(&types.AuthorizingUser{
+	if err = db.InsertAuthorizingUser(&types.AuthorizingUser{
 		Code:      "1",
 		CSRFToken: pk,
 	}); err != nil {
-		t.Errorf("InsertAuhorizingUser should succeed but got: %s", err)
+		t.Errorf("InsertAuthorizingUser should succeed but got: %s", err)
 	}
 	var user *types.AuthorizingUser
 	if user, err = db.AuthorizingUser(pk); err != nil {
