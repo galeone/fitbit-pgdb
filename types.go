@@ -3,7 +3,7 @@ package fitbit_pgdb
 import (
 	"time"
 
-	"github.com/galeone/fitbit/types"
+	"github.com/galeone/fitbit/v2/types"
 )
 
 // AuthorizedUser wraps fitbit types.AuthorizedUser
